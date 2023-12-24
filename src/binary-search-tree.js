@@ -83,39 +83,55 @@ class BinarySearchTree {
   }
 
   #find(node, data) {
-      if (data < node.data) {
-          if (node.left == null) {
-              return null;
-          } else if (node.left.data === data) {
-              return node.left;
-          } else {
-              return this.#find(node.left, data);
-          }
-      } else if (data > node.data) {
-          if (node.right == null) {
-              return null;
-          } else if (node.right.data === data) {
-              return node.right;
-          } else {
-              return this.#find(node.right, data);
-          }
-      }
+    if (data < node.data) {
+        if (node.left == null) {
+            return null;
+        } else if (node.left.data === data) {
+            node.left.root = node;
+            return node.left;
+        } else {
+            return this.#find(node.left, data);
+        }
+    } else if (data > node.data) {
+        if (node.right == null) {
+            return null;
+        } else if (node.right.data === data) {
+            node.right.root = node;
+            return node.right;
+        } else {
+            return this.#find(node.right, data);
+        }
+    }
   }
 
   remove(data) {
-      let node = this.find(data);
-      if (node != null) {
-          if (node.left == null && node.right == null) {
-              node = null;
-          } else if (node.left != null && node.right == null) {
-              node = node.left;
-          } else if (node.left == null && node.right != null) {
-              node = node.right;
-          } else {
-              node = this.#max(node);
-          }
-      }
-  }
+    let node = this.find(data);
+    if (node != null) {
+        if (node.left == null && node.right == null) {
+            if (node.root.left) {
+                node.root.left = null;
+            }
+            if (node.root.right) {
+                node.root.right = null;
+            }
+        } else if (node.left != null && node.right == null) {
+            if (node.root.left) {
+                node.root.left = node.left;
+            }
+        } else if (node.left == null && node.right != null) {
+            if (node.root.right) {
+                node.root.right = node.right;
+            }
+        } else {
+            if (node.root == null) {
+                let min = this.#min(node.right);
+                let minNode = this.find(min);
+                minNode.left = this.rootNode.left;
+                this.rootNode = this.rootNode.right;
+            }
+        }
+    }
+  } 
 
   min() {
       if (this.rootNode == null) {
